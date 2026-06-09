@@ -1,0 +1,8 @@
+.env
+__pycache__/
+*.pyc
+logs/
+.airflow/
+target/
+dbt_packages/
+profiles.yml
