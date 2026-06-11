@@ -6,57 +6,219 @@ from datetime import datetime, timedelta
 output_dir = Path("data/raw")
 output_dir.mkdir(parents=True, exist_ok=True)
 
-regions = ["North", "South", "East", "West"]
-markets = ["Brazil", "Mexico", "Spain", "France"]
-teams = ["Team A", "Team B", "Team C"]
-staff = ["Alice", "Ben", "Cathy", "David", "Emma", "Frank"]
-
-rows = []
+region_structure = {
+    "east": {
+        "market": "Mexico",
+        "market_type": "developing",
+        "starting_total_day": 40,
+        "base_inflow_range": (300, 450),
+        "region_marketing_cost": 45000,
+        "teams": {
+            "Team A": ["Cathy", "Alice"],
+            "Team B": ["Ben", "David"],
+            "Team C": ["Emma", "Frank"],
+        },
+    },
+    "west": {
+        "market": "Brazil",
+        "market_type": "developing",
+        "starting_total_day": 55,
+        "base_inflow_range": (400, 550),
+        "region_marketing_cost": 52000,
+        "teams": {
+            "Team A": ["Grace", "Henry"],
+            "Team B": ["Ivy", "Jack"],
+            "Team C": ["Kelly", "Leo"],
+        },
+    },
+    "north": {
+        "market": "Spain",
+        "market_type": "developed",
+        "starting_total_day": 60,
+        "base_inflow_range": (450, 620),
+        "region_marketing_cost": 75000,
+        "teams": {
+            "Team A": ["Mia", "Noah"],
+            "Team B": ["Olivia", "Paul"],
+            "Team C": ["Queen", "Ryan"],
+        },
+    },
+    "south": {
+        "market": "France",
+        "market_type": "developed",
+        "starting_total_day": 70,
+        "base_inflow_range": (520, 700),
+        "region_marketing_cost": 88000,
+        "teams": {
+            "Team A": ["Sophia", "Tom"],
+            "Team B": ["Uma", "Victor"],
+            "Team C": ["Wendy", "Zack"],
+        },
+    },
+}
 
 start_date = datetime(2026, 1, 1)
+num_days_to_generate = 30
 
-for i in range(120):
-    date = start_date + timedelta(days=i % 30)
-    region = random.choice(regions)
-    market = random.choice(markets)
-    team = random.choice(teams)
-    sales_rep = random.choice(staff)
+base_total_inflow = {}
+previous_retained_users = {}
 
-    total_leads = random.randint(200, 800)
-    retained_leads = random.randint(80, total_leads)
-    readers = random.randint(50, retained_leads)
-    conversations = random.randint(20, readers)
-    replies = random.randint(10, conversations)
-    deep_replies = random.randint(5, replies)
-    new_accounts = random.randint(0, 20)
-    total_accounts = random.randint(new_accounts, 100)
-    active_customers = random.randint(0, total_accounts)
-    follow_up_orders = random.randint(0, active_customers)
+cumulative_accounts = {}
+cumulative_paying_users = {}
+cumulative_revenue = {}
+cumulative_refund = {}
 
-    rows.append({
-        "report_date": date.strftime("%Y-%m-%d"),
-        "operation_day": random.randint(1, 30),
-        "total_day": random.randint(10, 60),
-        "region": region,
-        "market": market,
-        "team": team,
-        "sales_rep": sales_rep,
-        "total_leads": total_leads,
-        "retained_leads": retained_leads,
-        "read_users_today": readers,
-        "conversation_users_today": conversations,
-        "reply_users_today": replies,
-        "deep_reply_users_today": deep_replies,
-        "new_accounts_today": new_accounts,
-        "total_accounts": total_accounts,
-        "active_customers_today": active_customers,
-        "follow_up_orders_today": follow_up_orders,
-        "marketing_cost": round(random.uniform(1000, 8000), 2)
-    })
+for region, structure in region_structure.items():
+    min_inflow, max_inflow = structure["base_inflow_range"]
 
-df = pd.DataFrame(rows)
+    for team, sales_reps in structure["teams"].items():
+        for sales_rep in sales_reps:
+            key = (region, team, sales_rep)
 
-df.to_csv(output_dir / "regional_operations_sample.csv", index=False)
+            base_total_inflow[key] = random.randint(min_inflow, max_inflow)
+            previous_retained_users[key] = base_total_inflow[key]
 
-print("Sample data generated: data/raw/regional_operations_sample.csv")
-print(df.head())
+            cumulative_accounts[key] = 0
+            cumulative_paying_users[key] = 0
+            cumulative_revenue[key] = 0.0
+            cumulative_refund[key] = 0.0
+
+for region, structure in region_structure.items():
+    rows = []
+
+    market = structure["market"]
+    market_type = structure["market_type"]
+    starting_total_day = structure["starting_total_day"]
+    region_marketing_cost = structure["region_marketing_cost"]
+
+    for day_offset in range(num_days_to_generate):
+        report_date = start_date + timedelta(days=day_offset)
+
+        operation_day = day_offset + 1
+        total_day = starting_total_day + day_offset
+
+        for team, sales_reps in structure["teams"].items():
+            for sales_rep in sales_reps:
+                key = (region, team, sales_rep)
+
+                total_inflow = base_total_inflow[key]
+
+                daily_loss = random.choice([0, 0, 1, 1, 2])
+                retained_users = max(
+                    previous_retained_users[key] - daily_loss,
+                    int(total_inflow * 0.75)
+                )
+                previous_retained_users[key] = retained_users
+
+                read_users_today = random.randint(
+                    int(retained_users * 0.60),
+                    int(retained_users * 0.75)
+                )
+
+                conversation_users_today = random.randint(
+                    int(read_users_today * 0.70),
+                    int(read_users_today * 0.90)
+                )
+
+                reply_users_today = random.randint(
+                    int(conversation_users_today * 0.70),
+                    int(conversation_users_today * 0.90)
+                )
+
+                deep_reply_users_today = random.randint(
+                    int(reply_users_today * 0.50),
+                    int(reply_users_today * 0.75)
+                )
+
+                follow_up_actions_today = random.randint(
+                    int(deep_reply_users_today * 0.60),
+                    max(
+                        int(deep_reply_users_today * 0.90),
+                        int(deep_reply_users_today * 0.60)
+                    )
+                )
+
+                if total_inflow >= 600:
+                    new_accounts_today = random.randint(12, 22)
+                elif total_inflow >= 500:
+                    new_accounts_today = random.randint(10, 20)
+                elif total_inflow >= 400:
+                    new_accounts_today = random.randint(7, 15)
+                else:
+                    new_accounts_today = random.randint(5, 10)
+
+                new_accounts_today = min(new_accounts_today, deep_reply_users_today)
+
+                cumulative_accounts[key] += new_accounts_today
+                total_accounts = cumulative_accounts[key]
+
+                if total_inflow >= 600:
+                    paying_users_today = random.randint(6, 12)
+                elif total_inflow >= 500:
+                    paying_users_today = random.randint(5, 10)
+                elif total_inflow >= 400:
+                    paying_users_today = random.randint(2, 7)
+                else:
+                    paying_users_today = random.randint(0, 5)
+
+                paying_users_today = min(paying_users_today, new_accounts_today)
+
+                cumulative_paying_users[key] += paying_users_today
+                total_paying_users = cumulative_paying_users[key]
+
+                if paying_users_today > 0:
+                    revenue_today = round(
+                        paying_users_today * random.uniform(50, 300),
+                        2
+                    )
+                else:
+                    revenue_today = 0.0
+
+                refund_today = (
+                    round(revenue_today * random.uniform(0.02, 0.12), 2)
+                    if revenue_today > 0
+                    else 0.0
+                )
+
+                cumulative_revenue[key] += revenue_today
+                cumulative_refund[key] += refund_today
+
+                total_revenue = round(cumulative_revenue[key], 2)
+                total_refund = round(cumulative_refund[key], 2)
+                net_revenue = round(total_revenue - total_refund, 2)
+
+                rows.append({
+                    "report_date": report_date.strftime("%Y-%m-%d"),
+                    "operation_day": operation_day,
+                    "total_day": total_day,
+                    "region": region,
+                    "market": market,
+                    "market_type": market_type,
+                    "team": team,
+                    "sales_rep": sales_rep,
+                    "total_inflow": total_inflow,
+                    "retained_users": retained_users,
+                    "read_users_today": read_users_today,
+                    "conversation_users_today": conversation_users_today,
+                    "reply_users_today": reply_users_today,
+                    "deep_reply_users_today": deep_reply_users_today,
+                    "follow_up_actions_today": follow_up_actions_today,
+                    "new_accounts_today": new_accounts_today,
+                    "total_accounts": total_accounts,
+                    "paying_users_today": paying_users_today,
+                    "total_paying_users": total_paying_users,
+                    "revenue_today": revenue_today,
+                    "total_revenue": total_revenue,
+                    "refund_today": refund_today,
+                    "total_refund": total_refund,
+                    "net_revenue": net_revenue,
+                    "region_marketing_cost": region_marketing_cost,
+                })
+
+    df = pd.DataFrame(rows)
+    file_path = output_dir / f"{region}_operations.csv"
+    df.to_csv(file_path, index=False)
+
+    print(f"Generated file: {file_path} | rows: {len(df)}")
+
+print("All regional files generated successfully.")
