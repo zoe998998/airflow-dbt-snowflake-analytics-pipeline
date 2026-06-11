@@ -58,8 +58,8 @@ region_structure = {
 }
 
 market_revenue_range = {
-    "developing": (40, 120),
-    "developed": (120, 350),
+    "developing": (120, 300),
+    "developed": (350, 900),
 }
 
 start_date = datetime(2026, 1, 1)
@@ -162,13 +162,13 @@ for region, structure in region_structure.items():
                 cumulative_accounts[key] += new_accounts_today
                 total_accounts = cumulative_accounts[key]
 
-                # Paying conversion is higher in developed markets.
+                # Developed markets have stronger paying conversion.
                 if market_type == "developed":
-                    min_paying_rate = 0.40
-                    max_paying_rate = 0.70
+                    min_paying_rate = 0.50
+                    max_paying_rate = 0.80
                 else:
-                    min_paying_rate = 0.20
-                    max_paying_rate = 0.50
+                    min_paying_rate = 0.25
+                    max_paying_rate = 0.55
 
                 min_paying_users = int(new_accounts_today * min_paying_rate)
                 max_paying_users = int(new_accounts_today * max_paying_rate)
