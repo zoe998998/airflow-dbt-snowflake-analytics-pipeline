@@ -57,6 +57,11 @@ region_structure = {
     },
 }
 
+market_revenue_range = {
+    "developing": (40, 120),
+    "developed": (120, 350),
+}
+
 start_date = datetime(2026, 1, 1)
 num_days_to_generate = 30
 
@@ -91,6 +96,8 @@ for region, structure in region_structure.items():
     starting_total_day = structure["starting_total_day"]
     region_marketing_cost = structure["region_marketing_cost"]
 
+    min_revenue_per_user, max_revenue_per_user = market_revenue_range[market_type]
+
     for day_offset in range(num_days_to_generate):
         report_date = start_date + timedelta(days=day_offset)
 
@@ -103,6 +110,7 @@ for region, structure in region_structure.items():
 
                 total_inflow = base_total_inflow[key]
 
+                # Retained users can only stay the same or decrease slowly.
                 daily_loss = random.choice([0, 0, 1, 1, 2])
                 retained_users = max(
                     previous_retained_users[key] - daily_loss,
@@ -110,6 +118,7 @@ for region, structure in region_structure.items():
                 )
                 previous_retained_users[key] = retained_users
 
+                # Funnel logic based on retained users.
                 read_users_today = random.randint(
                     int(retained_users * 0.60),
                     int(retained_users * 0.75)
@@ -138,6 +147,7 @@ for region, structure in region_structure.items():
                     )
                 )
 
+                # Account creation scales with total inflow.
                 if total_inflow >= 600:
                     new_accounts_today = random.randint(12, 22)
                 elif total_inflow >= 500:
@@ -152,14 +162,24 @@ for region, structure in region_structure.items():
                 cumulative_accounts[key] += new_accounts_today
                 total_accounts = cumulative_accounts[key]
 
-                if total_inflow >= 600:
-                    paying_users_today = random.randint(6, 12)
-                elif total_inflow >= 500:
-                    paying_users_today = random.randint(5, 10)
-                elif total_inflow >= 400:
-                    paying_users_today = random.randint(2, 7)
+                # Paying conversion is higher in developed markets.
+                if market_type == "developed":
+                    min_paying_rate = 0.40
+                    max_paying_rate = 0.70
                 else:
-                    paying_users_today = random.randint(0, 5)
+                    min_paying_rate = 0.20
+                    max_paying_rate = 0.50
+
+                min_paying_users = int(new_accounts_today * min_paying_rate)
+                max_paying_users = int(new_accounts_today * max_paying_rate)
+
+                if new_accounts_today > 0:
+                    paying_users_today = random.randint(
+                        min_paying_users,
+                        max(1, max_paying_users)
+                    )
+                else:
+                    paying_users_today = 0
 
                 paying_users_today = min(paying_users_today, new_accounts_today)
 
@@ -168,7 +188,8 @@ for region, structure in region_structure.items():
 
                 if paying_users_today > 0:
                     revenue_today = round(
-                        paying_users_today * random.uniform(50, 300),
+                        paying_users_today
+                        * random.uniform(min_revenue_per_user, max_revenue_per_user),
                         2
                     )
                 else:
