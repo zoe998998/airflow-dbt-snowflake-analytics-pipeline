@@ -29,6 +29,7 @@ region_structure = {
             "Team A": ["Grace", "Henry"],
             "Team B": ["Ivy", "Jack"],
             "Team C": ["Kelly", "Leo"],
+            "Team D": ["Mason", "Nora"],
         },
     },
     "north": {
@@ -41,6 +42,8 @@ region_structure = {
             "Team A": ["Mia", "Noah"],
             "Team B": ["Olivia", "Paul"],
             "Team C": ["Queen", "Ryan"],
+            "Team D": ["Sarah", "Tony"],
+            "Team E": ["Uma", "Victor"],
         },
     },
     "south": {
@@ -50,9 +53,12 @@ region_structure = {
         "base_inflow_range": (520, 700),
         "region_marketing_cost": 88000,
         "teams": {
-            "Team A": ["Sophia", "Tom"],
-            "Team B": ["Uma", "Victor"],
-            "Team C": ["Wendy", "Zack"],
+            "Team A": ["Wendy", "Zack"],
+            "Team B": ["Aaron", "Bella"],
+            "Team C": ["Chris", "Diana"],
+            "Team D": ["Ethan", "Fiona"],
+            "Team E": ["George", "Hannah"],
+            "Team F": ["Isaac", "Julia"],
         },
     },
 }
@@ -110,7 +116,6 @@ for region, structure in region_structure.items():
 
                 total_inflow = base_total_inflow[key]
 
-                # Retained users can only stay the same or decrease slowly.
                 daily_loss = random.choice([0, 0, 1, 1, 2])
                 retained_users = max(
                     previous_retained_users[key] - daily_loss,
@@ -118,7 +123,6 @@ for region, structure in region_structure.items():
                 )
                 previous_retained_users[key] = retained_users
 
-                # Funnel logic based on retained users.
                 read_users_today = random.randint(
                     int(retained_users * 0.60),
                     int(retained_users * 0.75)
@@ -147,7 +151,6 @@ for region, structure in region_structure.items():
                     )
                 )
 
-                # Account creation scales with total inflow.
                 if total_inflow >= 600:
                     new_accounts_today = random.randint(12, 22)
                 elif total_inflow >= 500:
@@ -162,7 +165,6 @@ for region, structure in region_structure.items():
                 cumulative_accounts[key] += new_accounts_today
                 total_accounts = cumulative_accounts[key]
 
-                # Developed markets have stronger paying conversion.
                 if market_type == "developed":
                     min_paying_rate = 0.50
                     max_paying_rate = 0.80
