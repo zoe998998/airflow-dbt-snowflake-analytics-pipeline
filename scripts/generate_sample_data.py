@@ -11,8 +11,10 @@ region_structure = {
         "market": "Mexico",
         "market_type": "developing",
         "starting_total_day": 40,
-        "base_inflow_range": (300, 450),
+        "base_inflow_range": (300, 430),
         "region_marketing_cost": 45000,
+        "revenue_per_user_range": (120, 260),
+        "paying_rate_range": (0.25, 0.50),
         "teams": {
             "Team A": ["Cathy", "Alice"],
             "Team B": ["Ben", "David"],
@@ -23,8 +25,10 @@ region_structure = {
         "market": "Brazil",
         "market_type": "developing",
         "starting_total_day": 55,
-        "base_inflow_range": (400, 550),
+        "base_inflow_range": (380, 520),
         "region_marketing_cost": 52000,
+        "revenue_per_user_range": (140, 300),
+        "paying_rate_range": (0.28, 0.55),
         "teams": {
             "Team A": ["Grace", "Henry"],
             "Team B": ["Ivy", "Jack"],
@@ -36,8 +40,10 @@ region_structure = {
         "market": "Spain",
         "market_type": "developed",
         "starting_total_day": 60,
-        "base_inflow_range": (450, 620),
+        "base_inflow_range": (430, 560),
         "region_marketing_cost": 75000,
+        "revenue_per_user_range": (220, 480),
+        "paying_rate_range": (0.35, 0.65),
         "teams": {
             "Team A": ["Mia", "Noah"],
             "Team B": ["Olivia", "Paul"],
@@ -50,8 +56,10 @@ region_structure = {
         "market": "France",
         "market_type": "developed",
         "starting_total_day": 70,
-        "base_inflow_range": (520, 700),
+        "base_inflow_range": (480, 620),
         "region_marketing_cost": 88000,
+        "revenue_per_user_range": (250, 550),
+        "paying_rate_range": (0.38, 0.68),
         "teams": {
             "Team A": ["Wendy", "Zack"],
             "Team B": ["Aaron", "Bella"],
@@ -61,11 +69,6 @@ region_structure = {
             "Team F": ["Isaac", "Julia"],
         },
     },
-}
-
-market_revenue_range = {
-    "developing": (120, 300),
-    "developed": (350, 900),
 }
 
 start_date = datetime(2026, 1, 1)
@@ -102,7 +105,8 @@ for region, structure in region_structure.items():
     starting_total_day = structure["starting_total_day"]
     region_marketing_cost = structure["region_marketing_cost"]
 
-    min_revenue_per_user, max_revenue_per_user = market_revenue_range[market_type]
+    min_revenue_per_user, max_revenue_per_user = structure["revenue_per_user_range"]
+    min_paying_rate, max_paying_rate = structure["paying_rate_range"]
 
     for day_offset in range(num_days_to_generate):
         report_date = start_date + timedelta(days=day_offset)
@@ -152,25 +156,18 @@ for region, structure in region_structure.items():
                 )
 
                 if total_inflow >= 600:
-                    new_accounts_today = random.randint(12, 22)
+                    new_accounts_today = random.randint(12, 20)
                 elif total_inflow >= 500:
-                    new_accounts_today = random.randint(10, 20)
+                    new_accounts_today = random.randint(9, 16)
                 elif total_inflow >= 400:
-                    new_accounts_today = random.randint(7, 15)
+                    new_accounts_today = random.randint(6, 12)
                 else:
-                    new_accounts_today = random.randint(5, 10)
+                    new_accounts_today = random.randint(4, 9)
 
                 new_accounts_today = min(new_accounts_today, deep_reply_users_today)
 
                 cumulative_accounts[key] += new_accounts_today
                 total_accounts = cumulative_accounts[key]
-
-                if market_type == "developed":
-                    min_paying_rate = 0.50
-                    max_paying_rate = 0.80
-                else:
-                    min_paying_rate = 0.25
-                    max_paying_rate = 0.55
 
                 min_paying_users = int(new_accounts_today * min_paying_rate)
                 max_paying_users = int(new_accounts_today * max_paying_rate)
