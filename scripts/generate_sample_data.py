@@ -11,62 +11,62 @@ region_structure = {
         "market": "Mexico",
         "market_type": "developing",
         "starting_total_day": 40,
-        "base_inflow_range": (300, 430),
-        "region_marketing_cost": 45000,
+        "base_inflow_range": (280, 420),
+        "team_marketing_cost": 35000,
         "revenue_per_user_range": (120, 260),
         "paying_rate_range": (0.25, 0.50),
         "teams": {
             "Team A": ["Cathy", "Alice"],
             "Team B": ["Ben", "David"],
             "Team C": ["Emma", "Frank"],
+            "Team D": ["Grace", "Henry"],
+            "Team E": ["Ivy", "Jack"],
+            "Team F": ["Kelly", "Leo"],
         },
     },
     "west": {
         "market": "Brazil",
         "market_type": "developing",
         "starting_total_day": 55,
-        "base_inflow_range": (380, 520),
-        "region_marketing_cost": 52000,
+        "base_inflow_range": (330, 480),
+        "team_marketing_cost": 45000,
         "revenue_per_user_range": (140, 300),
         "paying_rate_range": (0.28, 0.55),
         "teams": {
-            "Team A": ["Grace", "Henry"],
-            "Team B": ["Ivy", "Jack"],
-            "Team C": ["Kelly", "Leo"],
-            "Team D": ["Mason", "Nora"],
+            "Team A": ["Mason", "Nora"],
+            "Team B": ["Oscar", "Penny"],
+            "Team C": ["Quinn", "Ruby"],
+            "Team D": ["Sam", "Tina"],
+            "Team E": ["Uri", "Vera"],
         },
     },
     "north": {
         "market": "Spain",
         "market_type": "developed",
         "starting_total_day": 60,
-        "base_inflow_range": (430, 560),
-        "region_marketing_cost": 75000,
-        "revenue_per_user_range": (220, 480),
+        "base_inflow_range": (360, 520),
+        "team_marketing_cost": 180000,
+        "revenue_per_user_range": (240, 520),
         "paying_rate_range": (0.35, 0.65),
         "teams": {
             "Team A": ["Mia", "Noah"],
             "Team B": ["Olivia", "Paul"],
             "Team C": ["Queen", "Ryan"],
             "Team D": ["Sarah", "Tony"],
-            "Team E": ["Uma", "Victor"],
         },
     },
     "south": {
         "market": "France",
         "market_type": "developed",
         "starting_total_day": 70,
-        "base_inflow_range": (480, 620),
-        "region_marketing_cost": 88000,
-        "revenue_per_user_range": (250, 550),
+        "base_inflow_range": (400, 560),
+        "team_marketing_cost": 200000,
+        "revenue_per_user_range": (280, 600),
         "paying_rate_range": (0.38, 0.68),
         "teams": {
             "Team A": ["Wendy", "Zack"],
             "Team B": ["Aaron", "Bella"],
             "Team C": ["Chris", "Diana"],
-            "Team D": ["Ethan", "Fiona"],
-            "Team E": ["George", "Hannah"],
-            "Team F": ["Isaac", "Julia"],
         },
     },
 }
@@ -103,8 +103,7 @@ for region, structure in region_structure.items():
     market = structure["market"]
     market_type = structure["market_type"]
     starting_total_day = structure["starting_total_day"]
-    region_marketing_cost = structure["region_marketing_cost"]
-
+    team_marketing_cost = structure["team_marketing_cost"]
     min_revenue_per_user, max_revenue_per_user = structure["revenue_per_user_range"]
     min_paying_rate, max_paying_rate = structure["paying_rate_range"]
 
@@ -151,18 +150,18 @@ for region, structure in region_structure.items():
                     int(deep_reply_users_today * 0.60),
                     max(
                         int(deep_reply_users_today * 0.90),
-                        int(deep_reply_users_today * 0.60)
-                    )
+                        int(deep_reply_users_today * 0.60),
+                    ),
                 )
 
-                if total_inflow >= 600:
-                    new_accounts_today = random.randint(12, 20)
-                elif total_inflow >= 500:
-                    new_accounts_today = random.randint(9, 16)
-                elif total_inflow >= 400:
-                    new_accounts_today = random.randint(6, 12)
+                if total_inflow >= 520:
+                    new_accounts_today = random.randint(10, 18)
+                elif total_inflow >= 430:
+                    new_accounts_today = random.randint(8, 14)
+                elif total_inflow >= 350:
+                    new_accounts_today = random.randint(5, 10)
                 else:
-                    new_accounts_today = random.randint(4, 9)
+                    new_accounts_today = random.randint(3, 8)
 
                 new_accounts_today = min(new_accounts_today, deep_reply_users_today)
 
@@ -189,7 +188,7 @@ for region, structure in region_structure.items():
                     revenue_today = round(
                         paying_users_today
                         * random.uniform(min_revenue_per_user, max_revenue_per_user),
-                        2
+                        2,
                     )
                 else:
                     revenue_today = 0.0
@@ -232,7 +231,7 @@ for region, structure in region_structure.items():
                     "refund_today": refund_today,
                     "total_refund": total_refund,
                     "net_revenue": net_revenue,
-                    "region_marketing_cost": region_marketing_cost,
+                    "team_marketing_cost": team_marketing_cost,
                 })
 
     df = pd.DataFrame(rows)
