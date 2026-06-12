@@ -1,0 +1,41 @@
+[33mcommit 3a8ce7fdccbe82de3f751512ea72e91529e1a39f[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m)[m
+Author: Yizuo Deng <zoe998998@gmail.com>
+Date:   Fri Jun 12 14:45:55 2026 +0800
+
+    Add Snowflake setup scripts
+
+[33mcommit bb447eb253a83b207a08d54324492286b6ab8486[m
+Author: Yizuo Deng <zoe998998@gmail.com>
+Date:   Thu Jun 11 21:08:59 2026 +0800
+
+    Balance regional revenue assumptions by team size
+
+[33mcommit 18b593454934ef1b79e8ee1eab024b8e532470fd[m
+Author: Yizuo Deng <zoe998998@gmail.com>
+Date:   Thu Jun 11 21:03:06 2026 +0800
+
+    Add varied team structures by region
+
+[33mcommit 89aa612cedd2b74e72787b9b2719573e5f579619[m
+Author: Yizuo Deng <zoe998998@gmail.com>
+Date:   Thu Jun 11 20:51:19 2026 +0800
+
+    Increase market-based revenue assumptions logic
+
+[33mcommit a2d901f6d5557d648ef1320064c99c33181cae29[m
+Author: Yizuo Deng <zoe998998@gmail.com>
+Date:   Thu Jun 11 20:45:22 2026 +0800
+
+    Add market-based revenue generation logic
+
+[33mcommit 0a692bfcf92d2516ed8b186e131b9bb756985c41[m
+Author: Yizuo Deng <zoe998998@gmail.com>
+Date:   Thu Jun 11 20:26:18 2026 +0800
+
+    Refine sample data with realistic regional operation days
+
+[33mcommit 936179a008451645a7726371b33c87e5eb5ef72d[m
+Author: Yizuo Deng <zoe998998@gmail.com>
+Date:   Tue Jun 9 16:56:28 2026 +0800
+
+    Initial project structure
