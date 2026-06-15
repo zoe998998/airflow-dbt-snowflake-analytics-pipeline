@@ -33,5 +33,9 @@ models:
   dbt_retail_pipeline:
     staging:
       +materialized: view
+
+    intermediate:
+      +materialized: view
+
     marts:
       +materialized: table
