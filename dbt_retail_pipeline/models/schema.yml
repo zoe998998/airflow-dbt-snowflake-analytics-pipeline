@@ -1,0 +1,148 @@
+version: 2
+
+models:
+  - name: stg_operations
+    description: "Clean staging view for daily regional operation records."
+    columns:
+      - name: report_date
+        tests:
+          - not_null
+
+      - name: region
+        tests:
+          - not_null
+
+      - name: market
+        tests:
+          - not_null
+
+      - name: market_type
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['developing', 'developed']
+
+      - name: sales_rep
+        tests:
+          - not_null
+
+      - name: total_inflow
+        tests:
+          - not_null
+
+      - name: retained_users
+        tests:
+          - not_null
+
+  - name: int_operations_kpis
+    description: "Intermediate model calculating row-level operational KPIs."
+    columns:
+      - name: retention_rate
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: "between 0 and 1"
+
+      - name: reading_rate
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: "between 0 and 1"
+
+      - name: reply_rate
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: "between 0 and 1"
+
+      - name: deep_reply_rate
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: "between 0 and 1"
+
+      - name: account_open_rate
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: "between 0 and 1"
+
+      - name: deposit_rate
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: "between 0 and 1"
+
+      - name: marketing_roi
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: ">= 0"
+
+  - name: mart_region_performance
+    description: "Region-level business performance mart for dashboard reporting."
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - region
+              - market
+
+    columns:
+      - name: region
+        tests:
+          - not_null
+
+      - name: market
+        tests:
+          - not_null
+
+      - name: sales_team_members
+        tests:
+          - not_null
+
+      - name: marketing_roi
+        tests:
+          - not_null
+
+      - name: net_revenue_per_team_member
+        tests:
+          - not_null
+
+  - name: mart_daily_trend
+    description: "Daily trend mart for revenue, account opening, and paying-user monitoring."
+    columns:
+      - name: report_date
+        tests:
+          - not_null
+          - unique
+
+      - name: daily_net_revenue
+        tests:
+          - not_null
+
+  - name: mart_weekly_summary
+    description: "Weekly regional performance mart for weekly dashboard reporting."
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - week_start
+              - region
+              - market
+
+    columns:
+      - name: week_start
+        tests:
+          - not_null
+
+      - name: weekly_net_revenue
+        tests:
+          - not_null
