@@ -19,7 +19,6 @@ models:
       - name: market_type
         tests:
           - accepted_values:
-              arguments:
                 values: ['developing', 'developed']
 
       - name: sales_rep
@@ -41,56 +40,48 @@ models:
         tests:
           - not_null
           - dbt_utils.expression_is_true:
-              arguments:
                 expression: "between 0 and 1"
 
       - name: reading_rate
         tests:
           - not_null
           - dbt_utils.expression_is_true:
-              arguments:
                 expression: "between 0 and 1"
 
       - name: reply_rate
         tests:
           - not_null
           - dbt_utils.expression_is_true:
-              arguments:
                 expression: "between 0 and 1"
 
       - name: deep_reply_rate
         tests:
           - not_null
           - dbt_utils.expression_is_true:
-              arguments:
                 expression: "between 0 and 1"
 
       - name: account_open_rate
         tests:
           - not_null
           - dbt_utils.expression_is_true:
-              arguments:
                 expression: "between 0 and 1"
 
       - name: deposit_rate
         tests:
           - not_null
           - dbt_utils.expression_is_true:
-              arguments:
                 expression: "between 0 and 1"
 
       - name: marketing_roi
         tests:
           - not_null
           - dbt_utils.expression_is_true:
-              arguments:
                 expression: ">= 0"
 
   - name: mart_region_performance
     description: "Region-level business performance mart for dashboard reporting."
     tests:
       - dbt_utils.unique_combination_of_columns:
-          arguments:
             combination_of_columns:
               - region
               - market
@@ -132,7 +123,6 @@ models:
     description: "Weekly regional performance mart for weekly dashboard reporting."
     tests:
       - dbt_utils.unique_combination_of_columns:
-          arguments:
             combination_of_columns:
               - week_start
               - region
