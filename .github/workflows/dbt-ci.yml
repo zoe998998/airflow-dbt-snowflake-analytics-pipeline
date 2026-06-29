@@ -20,12 +20,7 @@ jobs:
       - name: Install dbt
         run: pip install dbt-snowflake
 
-      - name: dbt deps
+      - name: dbt parse
         run: |
           cd dbt_retail_pipeline
-          dbt deps --profiles-dir /dev/null
-
-      - name: dbt compile
-        run: |
-          cd dbt_retail_pipeline
-          dbt compile --profiles-dir /dev/null
+          dbt parse
