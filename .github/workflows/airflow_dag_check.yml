@@ -1,0 +1,23 @@
+name: airflow DAG check
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  validate-dag:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install Airflow
+        run: pip install apache-airflow
+
+      - name: Test DAG syntax only
+        run: python -m py_compile dags/retail_analytics_pipeline_dag.py
