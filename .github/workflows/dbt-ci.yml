@@ -20,22 +20,23 @@ jobs:
       - name: Install dbt
         run: pip install dbt-snowflake
 
-      - name: Export Snowflake credentials
+      # ✅ inject secrets into environment
+      - name: Set Snowflake env vars
         run: |
           echo "SNOWFLAKE_ACCOUNT=${{ secrets.SNOWFLAKE_ACCOUNT }}" >> $GITHUB_ENV
           echo "SNOWFLAKE_USER=${{ secrets.SNOWFLAKE_USER }}" >> $GITHUB_ENV
           echo "SNOWFLAKE_PASSWORD=${{ secrets.SNOWFLAKE_PASSWORD }}" >> $GITHUB_ENV
           echo "SNOWFLAKE_ROLE=${{ secrets.SNOWFLAKE_ROLE }}" >> $GITHUB_ENV
-          echo "SNOWFLAKE_WAREHOUSE=${{ secrets.SNOWFLAKE_WAREHOUSE }}" >> $GITHUB_ENV
           echo "SNOWFLAKE_DATABASE=${{ secrets.SNOWFLAKE_DATABASE }}" >> $GITHUB_ENV
           echo "SNOWFLAKE_SCHEMA=${{ secrets.SNOWFLAKE_SCHEMA }}" >> $GITHUB_ENV
+          echo "SNOWFLAKE_WAREHOUSE=${{ secrets.SNOWFLAKE_WAREHOUSE }}" >> $GITHUB_ENV
 
       - name: dbt deps
         run: |
           cd dbt_retail_pipeline
-          dbt deps --profiles-dir /dev/null
+          dbt deps
 
       - name: dbt parse
         run: |
           cd dbt_retail_pipeline
-          dbt parse --profiles-dir /dev/null
+          dbt parse
