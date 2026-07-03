@@ -9,7 +9,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -19,5 +20,9 @@ jobs:
       - name: Install Airflow
         run: pip install apache-airflow
 
-      - name: Test DAG syntax only
+      - name: Check Python syntax
         run: python -m py_compile dags/retail_analytics_pipeline_dag.py
+
+      - name: Validate DAG import with DagBag
+        run: |
+          python -c "from airflow.models import DagBag; dagbag = DagBag(dag_folder='dags', include_examples=False); assert len(dagbag.import_errors) == 0, dagbag.import_errors"
