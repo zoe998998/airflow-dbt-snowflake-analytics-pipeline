@@ -77,3 +77,13 @@ jobs:
         run: |
           cd dbt_retail_pipeline
           dbt build
+
+      - name: Upload dbt artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dbt-artifacts
+          path: |
+            dbt_retail_pipeline/target/manifest.json
+            dbt_retail_pipeline/target/run_results.json
+            dbt_retail_pipeline/target/catalog.json
+            dbt_retail_pipeline/target/index.html
