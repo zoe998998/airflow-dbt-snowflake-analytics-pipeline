@@ -67,3 +67,8 @@ jobs:
         run: |
           cd dbt_retail_pipeline
           dbt compile
+
+      - name: dbt docs generate
+        run: |
+          cd dbt_retail_pipeline
+          dbt docs generate
