@@ -53,7 +53,7 @@ jobs:
           cd dbt_retail_pipeline
           dbt debug
 
-      - name: Install dependencies
+      - name: dbt deps
         run: |
           cd dbt_retail_pipeline
           dbt deps
@@ -62,3 +62,8 @@ jobs:
         run: |
           cd dbt_retail_pipeline
           dbt parse
+
+      - name: dbt compile
+        run: |
+          cd dbt_retail_pipeline
+          dbt compile
