@@ -8,6 +8,15 @@ jobs:
   dbt-check:
     runs-on: ubuntu-latest
 
+    env:
+      SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
+      SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
+      SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
+      SNOWFLAKE_ROLE: ${{ secrets.SNOWFLAKE_ROLE }}
+      SNOWFLAKE_DATABASE: ${{ secrets.SNOWFLAKE_DATABASE }}
+      SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
+      SNOWFLAKE_SCHEMA: ${{ secrets.SNOWFLAKE_SCHEMA }}
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -20,18 +29,31 @@ jobs:
       - name: Install dbt
         run: pip install dbt-snowflake
 
-      # ✅ inject secrets into environment
-      - name: Set Snowflake env vars
+      - name: Create dbt profiles
         run: |
-          echo "SNOWFLAKE_ACCOUNT=${{ secrets.SNOWFLAKE_ACCOUNT }}" >> $GITHUB_ENV
-          echo "SNOWFLAKE_USER=${{ secrets.SNOWFLAKE_USER }}" >> $GITHUB_ENV
-          echo "SNOWFLAKE_PASSWORD=${{ secrets.SNOWFLAKE_PASSWORD }}" >> $GITHUB_ENV
-          echo "SNOWFLAKE_ROLE=${{ secrets.SNOWFLAKE_ROLE }}" >> $GITHUB_ENV
-          echo "SNOWFLAKE_DATABASE=${{ secrets.SNOWFLAKE_DATABASE }}" >> $GITHUB_ENV
-          echo "SNOWFLAKE_SCHEMA=${{ secrets.SNOWFLAKE_SCHEMA }}" >> $GITHUB_ENV
-          echo "SNOWFLAKE_WAREHOUSE=${{ secrets.SNOWFLAKE_WAREHOUSE }}" >> $GITHUB_ENV
+          mkdir -p ~/.dbt
+          cat > ~/.dbt/profiles.yml << EOF
+          dbt_retail_pipeline:
+            target: dev
+            outputs:
+              dev:
+                type: snowflake
+                account: "$SNOWFLAKE_ACCOUNT"
+                user: "$SNOWFLAKE_USER"
+                password: "$SNOWFLAKE_PASSWORD"
+                role: "$SNOWFLAKE_ROLE"
+                database: "$SNOWFLAKE_DATABASE"
+                warehouse: "$SNOWFLAKE_WAREHOUSE"
+                schema: "$SNOWFLAKE_SCHEMA"
+                threads: 4
+          EOF
 
-      - name: dbt deps
+      - name: dbt debug
+        run: |
+          cd dbt_retail_pipeline
+          dbt debug
+
+      - name: Install dependencies
         run: |
           cd dbt_retail_pipeline
           dbt deps
