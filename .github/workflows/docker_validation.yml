@@ -1,0 +1,19 @@
+name: Docker Validation
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  docker-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Validate Docker Compose file
+        run: docker compose config
+
+      - name: Build Docker images
+        run: docker compose build
