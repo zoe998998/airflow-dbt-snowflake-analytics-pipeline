@@ -64,13 +64,14 @@ The project combines a layered analytics pipeline with workflow orchestration, c
 ```mermaid
 flowchart TD
     subgraph PIPELINE["Data Pipeline"]
-        A[Regional CSV Files]
-        B[Python Data Generation and Ingestion]
-        C[(Snowflake RAW Layer)]
-        D[dbt Staging Model]
-        E[dbt Intermediate KPI Model]
-        F[dbt Analytics Marts]
-        G[BI / Reporting]
+        A[Python Data Generation]
+        B[Regional CSV Files]
+        C[Python Snowflake Ingestion]
+        D[(Snowflake RAW Layer)]
+        E[dbt Staging Model]
+        F[dbt Intermediate KPI Model]
+        G[dbt Analytics Marts]
+        H[BI / Reporting]
 
         A --> B
         B --> C
@@ -78,18 +79,21 @@ flowchart TD
         D --> E
         E --> F
         F --> G
+        G --> H
     end
 
-    AF[Apache Airflow] -. Schedules and orchestrates .-> B
-    AF -. Executes dbt workflow .-> D
+    AF[Apache Airflow] -. Schedules and orchestrates .-> A
+    AF -. Runs ingestion .-> C
+    AF -. Executes dbt workflow .-> E
 
     PG[(PostgreSQL Metadata)] --> AF
     DC[Docker Compose] -. Runs Airflow and PostgreSQL .-> AF
 
     CI[GitHub Actions CI] -. Validates DAGs .-> AF
-    CI -. Validates dbt models .-> D
+    CI -. Validates dbt project .-> E
     CI -. Validates Docker configuration .-> DC
 ```
+---
 
 ### Architecture Components
 
