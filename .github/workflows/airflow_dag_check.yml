@@ -6,23 +6,51 @@ on:
 
 jobs:
   validate-dag:
+
     runs-on: ubuntu-latest
 
+    env:
+      AIRFLOW__CORE__LOAD_EXAMPLES: "False"
+
     steps:
+
       - name: Checkout repo
         uses: actions/checkout@v4
+
 
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
+
       - name: Install Airflow
-        run: pip install apache-airflow==2.11.0
+        run: |
+          pip install apache-airflow==2.11.0
+
+
+      - name: Initialize Airflow database
+        run: |
+          airflow db migrate
+
 
       - name: Check Python syntax
-        run: python -m py_compile dags/retail_analytics_pipeline_dag.py
+        run: |
+          python -m py_compile dags/retail_analytics_pipeline_dag.py
+
 
       - name: Validate DAG import with DagBag
         run: |
-          python -c "from airflow.models import DagBag; dagbag = DagBag(dag_folder='dags'); assert len(dagbag.import_errors) == 0, dagbag.import_errors"
+          python - <<EOF
+          from airflow.models import DagBag
+
+          dagbag = DagBag(
+              dag_folder="dags"
+          )
+
+          if dagbag.import_errors:
+              print(dagbag.import_errors)
+              raise Exception("DAG import failed")
+
+          print("DAG validation successful")
+          EOF
