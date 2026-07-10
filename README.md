@@ -223,52 +223,47 @@ The generated operational data is loaded into the Snowflake **RAW** schema befor
 
 ### dbt Models
 
-The project follows a layered dbt architecture consisting of staging, intermediate and mart models.
+The project follows a layered dbt architecture consisting of **staging**, **intermediate**, and **mart** models.
 
 ![dbt Models](screenshots/05_snowflake_dbt_models.png)
 
-![Staging Preview](screenshots/06_stg_operations_preview.png)
-
-![Intermediate Preview](screenshots/07_int_operations_kpis_preview.png)
-
-![Daily Mart](screenshots/08_mart_daily_trend.png)
-
-![Weekly Mart](screenshots/09_mart_weekly_summary.png)
-
-![Regional Mart](screenshots/10_mart_region_performance.png)
-
 ### dbt Lineage Documentation
 
-The dbt project follows a layered transformation architecture:
-
-- Raw source layer
-- Staging models for cleaning and standardisation
-- Intermediate models for KPI calculations
-- Mart models for analytics consumption
-
-The generated dbt documentation provides model lineage and dependency visualization.
+The generated dbt documentation provides model lineage and dependency visualization across the transformation layers.
 
 ![dbt Lineage](screenshots/16_dbt_docs_lineage.png)
 
 ### Staging Layer
 
-- Cleans raw data
-- Standardizes column names
-- Casts data types
-- Removes inconsistencies
+The staging layer prepares raw operational data for downstream modeling by:
+
+- cleaning raw data
+- standardizing column names
+- casting data types
+- removing inconsistencies
+
+![Staging Preview](screenshots/06_stg_operations_preview.png)
 
 ### Intermediate Layer
 
-Calculates business KPIs including:
+The intermediate layer calculates reusable business KPIs, including:
 
 - Retention Rate
 - Reading Rate
 - Reply Rate
 - Revenue Metrics
 
+![Intermediate Preview](screenshots/07_int_operations_kpis_preview.png)
+
 ### Mart Layer
 
-Produces final reporting tables ready for BI dashboards and analytics.
+The mart layer produces analytics-ready tables for reporting and business analysis.
+
+![Daily Mart](screenshots/08_mart_daily_trend.png)
+
+![Weekly Mart](screenshots/09_mart_weekly_summary.png)
+
+![Regional Mart](screenshots/10_mart_region_performance.png)
 
 ---
 
