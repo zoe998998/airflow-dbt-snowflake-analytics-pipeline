@@ -27,7 +27,7 @@ services:
       - ./data:/opt/airflow/data
       - ./dbt_retail_pipeline:/opt/airflow/dbt_retail_pipeline
       - ./logs:/opt/airflow/logs
-      - C:\Users\win\.dbt:/opt/airflow/.dbt
+      - C:\Users\win\.dbt:/home/airflow/.dbt
     command: >
       bash -c "airflow db migrate &&
       airflow users create
@@ -57,7 +57,7 @@ services:
       - ./data:/opt/airflow/data
       - ./dbt_retail_pipeline:/opt/airflow/dbt_retail_pipeline
       - ./logs:/opt/airflow/logs
-      - C:\Users\win\.dbt:/opt/airflow/.dbt
+      - C:\Users\win\.dbt:/home/airflow/.dbt
     command: webserver
 
   airflow-scheduler:
@@ -76,5 +76,5 @@ services:
       - ./data:/opt/airflow/data
       - ./dbt_retail_pipeline:/opt/airflow/dbt_retail_pipeline
       - ./logs:/opt/airflow/logs
-      - C:\Users\win\.dbt:/opt/airflow/.dbt
+      - C:\Users\win\.dbt:/home/airflow/.dbt
     command: scheduler

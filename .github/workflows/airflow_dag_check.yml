@@ -24,9 +24,10 @@ jobs:
           python-version: "3.12"
 
 
-      - name: Install Airflow
+      - name: Install dependencies
         run: |
           pip install apache-airflow==2.11.0
+          pip install pandas python-dotenv snowflake-connector-python
 
 
       - name: Initialize Airflow database

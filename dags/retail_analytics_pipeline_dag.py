@@ -7,7 +7,7 @@ from airflow.operators.bash import BashOperator
 
 AIRFLOW_HOME = "/opt/airflow"
 DBT_PROJECT_DIR = "/opt/airflow/dbt_retail_pipeline"
-DBT_PROFILES_DIR = "/opt/airflow/.dbt"
+DBT_PROFILES_DIR = "/home/airflow/.dbt"
 
 local_tz = pendulum.timezone("Asia/Shanghai")
 

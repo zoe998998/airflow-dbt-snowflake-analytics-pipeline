@@ -59,51 +59,49 @@ This project implements that complete workflow.
 
 # Architecture
 
-## Overall Architecture
+The project combines a layered analytics pipeline with workflow orchestration, containerized runtime services, and automated CI validation.
 
-The project follows a modern layered Data Engineering architecture.
+```mermaid
+flowchart TD
+    subgraph PIPELINE["Data Pipeline"]
+        A[Regional CSV Files]
+        B[Python Data Generation and Ingestion]
+        C[(Snowflake RAW Layer)]
+        D[dbt Staging Model]
+        E[dbt Intermediate KPI Model]
+        F[dbt Analytics Marts]
+        G[BI / Reporting]
 
-Raw CSV Files
-        │
-        ▼
-Python ETL
-        │
-        ▼
-Snowflake RAW Layer
-        │
-        ▼
-dbt Transformations
-(Staging → Intermediate → Marts)
-        │
-        ▼
-Analytics Marts
-        │
-        ▼
-BI / Reporting Layer
+        A --> B
+        B --> C
+        C --> D
+        D --> E
+        E --> F
+        F --> G
+    end
 
+    AF[Apache Airflow] -. Schedules and orchestrates .-> B
+    AF -. Executes dbt workflow .-> D
 
-Apache Airflow
-        │
-        ▼
-Orchestrates the complete workflow
+    PG[(PostgreSQL Metadata)] --> AF
+    DC[Docker Compose] -. Runs Airflow and PostgreSQL .-> AF
 
+    CI[GitHub Actions CI] -. Validates DAGs .-> AF
+    CI -. Validates dbt models .-> D
+    CI -. Validates Docker configuration .-> DC
+```
 
-Docker
-        │
-        ▼
-Runs the application environment
+### Architecture Components
 
-
-GitHub Actions
-        │
-        ▼
-Continuous Integration (CI)
-- dbt validation
-- Airflow DAG validation
-- Docker validation
-
-
-![Architecture](screenshots/11_architecture_overview.png)
+| Component | Responsibility |
+|---|---|
+| Python | Generates regional operational data and loads it into Snowflake |
+| Snowflake | Stores raw operational data and transformed analytics models |
+| dbt | Cleans data, calculates reusable KPIs, builds marts, runs tests, and generates lineage documentation |
+| Apache Airflow | Schedules and orchestrates the complete pipeline |
+| PostgreSQL | Stores Airflow metadata, task states, and execution history |
+| Docker Compose | Runs the local Airflow and PostgreSQL environment consistently |
+| GitHub Actions | Performs dbt, Airflow DAG, and Docker validation after every push |
 
 ---
 
@@ -120,7 +118,7 @@ Continuous Integration (CI)
 | Version Control | Git |
 | Database | PostgreSQL (Airflow Metadata) |
 | Data Processing | Pandas |
-| Cloud Authentication | GitHub Secrets |
+| Secrets & Configuration | GitHub Secrets & Environment Variables |
 
 ---
 
@@ -303,9 +301,9 @@ Pipeline tasks include:
 
 1. Generate daily data
 2. Load data into Snowflake
-3. Execute dbt transformations
-4. Run dbt tests
-5. Validate pipeline execution
+3. Install dbt package dependencies
+4. Execute dbt models
+5. Run dbt tests
 
 The DAG provides:
 
@@ -341,7 +339,7 @@ Airflow records the execution history for monitoring and troubleshooting.
 
 # Docker
 
-The entire project runs inside Docker containers.
+The local orchestration environment runs inside Docker containers.
 
 The local development environment exposes:
 
@@ -368,23 +366,28 @@ Docker ensures consistent environments across development and deployment.
 
 # Python Dependencies
 
-The project separates application dependencies from the orchestration environment.
+The standalone Python and dbt dependencies are listed in `requirements.txt`.
 
-Python dependencies are managed through `requirements.txt` and include:
+They include:
 
 - Pandas and NumPy for data processing
 - Snowflake Connector for database connectivity
-- dbt Core and dbt Snowflake adapter for data transformation
-- python-dotenv for environment configuration
+- dbt Core and the dbt Snowflake adapter for data transformation
+- python-dotenv for local environment configuration
 
-Airflow dependencies are managed through the Docker image to ensure a consistent orchestration environment.
+Airflow runtime dependencies are managed through the Docker image to maintain a consistent orchestration environment.
 
-Install Python dependencies locally with:
+The GitHub Actions DAG-check workflow runs in a separate temporary environment. It installs the pinned Airflow version and only the additional packages required to import and validate the DAG.
+
+For optional local development outside Docker, install the standalone dependencies with:
 
 ```bash
 pip install -r requirements.txt
-
 ```
+
+When running the project entirely through Docker, this manual installation is not required.
+
+---
 
 # Continuous Integration
 
@@ -402,7 +405,7 @@ The CI pipeline performs:
 - Docker Compose validation
 - Airflow DAG validation
 
-This prevents broken pipelines from being merged into the repository.
+This automatically detects broken pipeline changes after every push to the main branch.
 
 ### GitHub Actions Workflow
 
@@ -487,7 +490,7 @@ Through building this project, I gained hands-on experience with:
 
 - designing layered data warehouse architectures
 - orchestrating end-to-end ETL workflows
-- implementing CI/CD for analytics engineering
+- implementing continuous integration for analytics engineering
 - containerizing data platforms with Docker
 - building maintainable dbt projects
 - applying software engineering best practices to data pipelines
