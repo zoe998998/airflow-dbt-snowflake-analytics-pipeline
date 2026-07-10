@@ -47,6 +47,7 @@ services:
       - .env
     ports:
       - "8080:8080"
+      - "8081:8081"
     environment:
       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
       AIRFLOW__CORE__LOAD_EXAMPLES: "false"

@@ -72,25 +72,38 @@ Python ETL
 Snowflake RAW Layer
         │
         ▼
-dbt Staging Models
+dbt Transformations
+(Staging → Intermediate → Marts)
         │
         ▼
-dbt Intermediate Models
+Analytics Marts
         │
         ▼
-dbt Mart Models
-        │
-        ▼
+BI / Reporting Layer
+
+
 Apache Airflow
         │
         ▼
+Orchestrates the complete workflow
+
+
 Docker
         │
         ▼
-GitHub Actions CI/CD
+Runs the application environment
 
 
-![Architecture](screenshots/11_data_engineer_role.png)
+GitHub Actions
+        │
+        ▼
+Continuous Integration (CI)
+- dbt validation
+- Airflow DAG validation
+- Docker validation
+
+
+![Architecture](screenshots/11_architecture_overview.png)
 
 ---
 
@@ -103,7 +116,7 @@ GitHub Actions CI/CD
 | Data Transformation | dbt Core |
 | Workflow Orchestration | Apache Airflow |
 | Containerization | Docker & Docker Compose |
-| CI/CD | GitHub Actions |
+| CI | GitHub Actions |
 | Version Control | Git |
 | Database | PostgreSQL (Airflow Metadata) |
 | Data Processing | Pandas |
@@ -226,6 +239,19 @@ The project follows a layered dbt architecture consisting of staging, intermedia
 
 ![Regional Mart](screenshots/10_mart_region_performance.png)
 
+### dbt Lineage Documentation
+
+The dbt project follows a layered transformation architecture:
+
+- Raw source layer
+- Staging models for cleaning and standardisation
+- Intermediate models for KPI calculations
+- Mart models for analytics consumption
+
+The generated dbt documentation provides model lineage and dependency visualization.
+
+![dbt Lineage](screenshots/16_dbt_docs_lineage.png)
+
 ### Staging Layer
 
 - Cleans raw data
@@ -277,9 +303,9 @@ Pipeline tasks include:
 
 1. Generate daily data
 2. Load data into Snowflake
-3. Install dbt dependencies
-4. Execute dbt models
-5. Run dbt tests
+3. Execute dbt transformations
+4. Run dbt tests
+5. Validate pipeline execution
 
 The DAG provides:
 
@@ -317,6 +343,15 @@ Airflow records the execution history for monitoring and troubleshooting.
 
 The entire project runs inside Docker containers.
 
+The local development environment exposes:
+
+- Airflow Webserver: `localhost:8080`
+- dbt Documentation Server: `localhost:8081`
+
+These services run independently, allowing Airflow monitoring and dbt documentation browsing to be accessed separately.
+
+Airflow provides workflow orchestration and monitoring, while dbt documentation provides interactive model documentation and lineage visualization.
+
 Containerized services include:
 
 - Apache Airflow
@@ -325,9 +360,31 @@ Containerized services include:
 - Webserver
 - Initialization Service
 
+The Airflow environment is built from the official Apache Airflow Docker image with additional dbt and Snowflake dependencies installed.
+
 Docker ensures consistent environments across development and deployment.
 
 ---
+
+# Python Dependencies
+
+The project separates application dependencies from the orchestration environment.
+
+Python dependencies are managed through `requirements.txt` and include:
+
+- Pandas and NumPy for data processing
+- Snowflake Connector for database connectivity
+- dbt Core and dbt Snowflake adapter for data transformation
+- python-dotenv for environment configuration
+
+Airflow dependencies are managed through the Docker image to ensure a consistent orchestration environment.
+
+Install Python dependencies locally with:
+
+```bash
+pip install -r requirements.txt
+
+```
 
 # Continuous Integration
 
@@ -335,7 +392,7 @@ GitHub Actions automatically validates every code change.
 
 The CI pipeline performs:
 
-- Python dependency installation
+- Python environment setup
 - Snowflake connection setup
 - Runtime configuration generation
 - dbt parse
@@ -408,7 +465,6 @@ This project demonstrates practical experience with:
 - Python Development
 
 ---
-
 
 # Future Improvements
 
